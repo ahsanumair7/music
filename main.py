@@ -16,6 +16,9 @@ class MusicCapability(MatchingCapability):
         """
         Play Music by downloading directly from python requests Module and passing the content to play_audio function
         """
+        self.worker.music_mode_event.set()
+        await self.capability_worker.send_data_over_websocket("music-mode",{"mode": "on"})
+        
         music_response = requests.get("https://cdn.pixabay.com/download/audio/2023/10/22/audio_6d1fc2e6c3.mp3?filename=rise-up-172724.mp3")
         music = music_response.content
         await self.capability_worker.play_audio(music)
@@ -26,6 +29,9 @@ class MusicCapability(MatchingCapability):
         """
         await self.capability_worker.play_from_audio_file("song.mp3")
 
+        await self.capability_worker.send_data_over_websocket("music-mode",{"mode": "off"})
+        self.worker.music_mode_event.clear()
+        
         # Resume the normal workflow
         self.capability_worker.resume_normal_flow()
 
